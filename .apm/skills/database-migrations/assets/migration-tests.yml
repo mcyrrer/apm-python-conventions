@@ -1,0 +1,64 @@
+# Migration integrity tests.
+# Copy to .github/workflows/migration-tests.yml in the consumer repo and adjust
+# the "Install dependencies" step and the DATABASE_URL driver to match the app.
+# See the database-migrations skill's references/migration-tests-ci.md.
+name: migration-tests
+
+on:
+  pull_request:
+    paths:
+      - "**/*.py"
+      - "**/migrations/**"
+      - "**/alembic.ini"
+      - ".github/workflows/migration-tests.yml"
+  push:
+    branches: [main]
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Match the driver your alembic env.py / app expects
+      # (postgresql+psycopg:// for sync, postgresql+asyncpg:// for async).
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/app_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        # Replace with your real install so `alembic` + the app package import,
+        # e.g. `uv sync`, `poetry install`, or `pip install -e .`.
+        run: pip install -e .
+
+      - name: Apply all migrations on a fresh database
+        run: alembic upgrade head
+
+      - name: Check models and migrations are in sync
+        # Fails if a model change has no matching migration (schema drift).
+        run: alembic check
+
+      - name: Downgrade / upgrade roundtrip
+        # Proves the latest revision's downgrade() reverses its upgrade().
+        run: |
+          alembic downgrade -1
+          alembic upgrade head

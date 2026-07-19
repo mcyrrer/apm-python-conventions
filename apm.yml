@@ -1,0 +1,47 @@
+# APM producer manifest — https://microsoft.github.io/apm/producer/
+# Validated against the manifest schema: https://microsoft.github.io/apm/reference/manifest-schema/
+name: python-conventions
+version: 0.1.0
+description: >-
+  Always-on Python backend conventions plus load-on-demand setup skills —
+  structlog logging (JSON in production, console for localhost), FastAPI and
+  FastMCP defaults, and SQLAlchemy + Alembic with CI-enforced migration tests on
+  PostgreSQL 17.
+author: Mattias Gustavsson
+license: MIT
+
+# Ships runtime primitives (skills + instructions) AND a manifest → HYBRID.
+type: hybrid
+
+# Compile targets this package is designed to deploy to. Claude is primary.
+target: [claude, copilot, cursor]
+
+# Self-contained; no external APM/MCP dependencies.
+dependencies:
+  apm: []
+  mcp: []
+
+compilation:
+  # Target selection is governed by the top-level `target:` list above.
+  strategy: distributed
+  resolve_links: true
+  source_attribution: true
+
+# Authoring metadata consumed by `apm pack` when publishing to a marketplace.
+marketplace:
+  owner:
+    name: mcyrrer
+    email: mcyrrer@gmail.com
+    url: https://github.com/mcyrrer
+  sourceBase: https://github.com/mcyrrer/apm-python-conventions
+  packages:
+    - name: python-conventions
+      source: mcyrrer/apm-python-conventions
+      version: "0.1.0"
+      description: >-
+        Python backend conventions — structlog logging (JSON/console), FastAPI and
+        FastMCP defaults, SQLAlchemy + Alembic with CI-enforced migration tests on
+        PostgreSQL 17, and core typing/async/layout rules.
+      homepage: https://github.com/mcyrrer/apm-python-conventions
+      tags: [python, structlog, fastapi, fastmcp, sqlalchemy, alembic, postgres, logging, conventions]
+      license: MIT
