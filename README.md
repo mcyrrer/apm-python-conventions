@@ -46,19 +46,35 @@ skills:
 
 ## Install (consumer)
 
-Add it to a consuming project's `apm.yml`:
+Add it to a consuming project's `apm.yml` under `dependencies.apm`, choosing how
+you want to track versions:
 
 ```yaml
 dependencies:
   apm:
+    # Pin to a released version (recommended) — reproducible; updates only when
+    # you change the ref:
     - mcyrrer/apm-python-conventions#v0.2.0
+
+    # …or track a semver range — `apm update` moves you to the highest matching
+    # release tag:
+    # - mcyrrer/apm-python-conventions#^0.2.0
+
+    # …or track the latest commit on the default branch (unpinned):
+    # - mcyrrer/apm-python-conventions
 ```
 
-then `apm install` and `apm compile`. Or install directly:
+Then run `apm install` (resolves the ref and writes `apm.lock.yaml`) and
+`apm compile`. Equivalent from the command line:
 
 ```bash
-apm install mcyrrer/apm-python-conventions
+apm install mcyrrer/apm-python-conventions#v0.2.0   # a specific released version (tag)
+apm install mcyrrer/apm-python-conventions#^0.2.0   # highest release matching a semver range
+apm install mcyrrer/apm-python-conventions          # latest on the default branch
 ```
+
+Releases are published as `v<version>` git tags (see [Releases](#releases)), so a
+pinned `#vX.Y.Z` always maps to an immutable, tagged release.
 
 Once installed, the instructions apply automatically and the skills load when you
 ask your agent to set up logging, a FastAPI/FastMCP service, or a database layer.

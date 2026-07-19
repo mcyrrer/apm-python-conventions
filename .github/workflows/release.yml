@@ -46,32 +46,14 @@ jobs:
           git tag "v${{ steps.v.outputs.version }}"
           git push origin "v${{ steps.v.outputs.version }}"
 
-      - name: Pack (best-effort)
-        id: pack
-        if: steps.check.outputs.exists == 'false'
-        continue-on-error: true
-        uses: microsoft/apm-action@v1
-        with:
-          pack: 'true'
-          archive: 'true'
-
       - name: Publish GitHub Release
         if: steps.check.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BUNDLE: ${{ steps.pack.outputs.bundle-path }}
           VERSION: ${{ steps.v.outputs.version }}
         run: |
-          # Attach whatever apm pack produced. This package has no dependencies,
-          # so bundle-path is often empty and pack emits the marketplace artifact
-          # instead — attach whichever exists; the release still publishes if none.
-          shopt -s nullglob
-          artifacts=()
-          [ -n "$BUNDLE" ] && [ -f "$BUNDLE" ] && artifacts+=( "$BUNDLE" )
-          for f in .claude-plugin/marketplace.json *.zip *.tar.gz *.apm.tgz; do
-            [ -f "$f" ] && artifacts+=( "$f" )
-          done
+          # Consumers install via the git tag (owner/repo#vX.Y.Z), so the release
+          # only needs the tag + notes — no packed bundle to attach.
           gh release create "v${VERSION}" \
             --title "v${VERSION}" \
-            --generate-notes \
-            "${artifacts[@]}"
+            --generate-notes
