@@ -51,7 +51,7 @@ Add it to a consuming project's `apm.yml`:
 ```yaml
 dependencies:
   apm:
-    - mcyrrer/apm-python-conventions#v0.1.0
+    - mcyrrer/apm-python-conventions#v0.2.0
 ```
 
 then `apm install` and `apm compile`. Or install directly:

@@ -19,6 +19,10 @@ scaffolding a project or wiring one of these tools.
 - **Structured, not interpolated.** Log an event name plus key/value pairs
   (`log.info("user.created", user_id=uid)`), don't f-string data into the
   message. Bind request/task context once with `log.bind(...)` / `contextvars`.
+- **Standard keys on every line.** Each log line carries the message plus callsite
+  fields (`filename`, `lineno`, `func_name`) in both console and JSON. The message
+  is rendered under the `message` key (structlog's default `event`, renamed) — the
+  positional event name at the call site is unchanged; only the output key differs.
 
 ## HTTP APIs
 
