@@ -45,5 +45,8 @@ scaffolding a project or wiring one of these tools.
   async SQLAlchemy) — don't block the event loop with sync I/O.
 - **Standard layout:** a `src/`-style importable package, dependencies declared
   and pinned in `pyproject.toml`.
+- **Clean, PEP 8-compliant style** is expected on every file — see
+  `clean-code.instructions.md` for the rules and the `code-quality` skill for the
+  Ruff + mypy setup that enforces them.
 - Data-layer work (SQLAlchemy / Alembic / PostgreSQL) follows
   `database.instructions.md` and the `database-migrations` skill.

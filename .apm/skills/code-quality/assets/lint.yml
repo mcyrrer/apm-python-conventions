@@ -1,0 +1,41 @@
+# Lint, format, and type checks.
+# Copy to .github/workflows/lint.yml in the consumer repo and adjust the
+# "Install dependencies" step and the Python version to match the app.
+# See the code-quality skill's references/tooling.md.
+name: lint
+
+on:
+  pull_request:
+    paths:
+      - "**/*.py"
+      - "pyproject.toml"
+      - ".github/workflows/lint.yml"
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        # Replace with your real install so ruff + mypy and the app package
+        # import, e.g. `uv sync`, `poetry install`, or `pip install -e .[dev]`.
+        run: pip install -e ".[dev]"
+
+      - name: Check formatting
+        # Fails if code isn't formatted; run `ruff format` locally to fix.
+        run: ruff format --check .
+
+      - name: Lint
+        # Style, imports, naming, and bug-prone patterns (see [tool.ruff.lint]).
+        run: ruff check .
+
+      - name: Type-check
+        run: mypy
