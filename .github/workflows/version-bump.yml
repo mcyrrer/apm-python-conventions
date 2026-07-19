@@ -55,11 +55,20 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "release/v${NEW}"
+          git switch -C "release/v${NEW}"
           git commit -am "Bump version to ${NEW}"
-          git push -u origin "release/v${NEW}"
-          gh pr create --base main --head "release/v${NEW}" \
-            --title "Release v${NEW}" \
-            --body "Automated version bump \`${CUR}\` → \`${NEW}\`.
+          # The release branch is regenerated from main on every run, so overwrite
+          # any stale branch a previous run may have left behind — otherwise the
+          # push is rejected as non-fast-forward.
+          git push --force -u origin "release/v${NEW}"
+          # Open a PR only if one isn't already open for this branch; a re-run just
+          # updates the existing PR's branch via the force-push above.
+          if [ -z "$(gh pr list --head "release/v${NEW}" --state open --json number --jq '.[0].number')" ]; then
+            gh pr create --base main --head "release/v${NEW}" \
+              --title "Release v${NEW}" \
+              --body "Automated version bump \`${CUR}\` → \`${NEW}\`.
 
           Merging this PR tags \`v${NEW}\` and publishes a GitHub Release."
+          else
+            echo "An open PR already exists for release/v${NEW}; updated its branch."
+          fi
