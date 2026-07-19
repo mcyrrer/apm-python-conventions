@@ -1,7 +1,7 @@
 # APM producer manifest — https://microsoft.github.io/apm/producer/
 # Validated against the manifest schema: https://microsoft.github.io/apm/reference/manifest-schema/
 name: python-conventions
-version: 0.2.0
+version: 1.0.0
 description: >-
   Always-on Python backend conventions plus load-on-demand setup skills —
   structlog logging (JSON in production, console for localhost), FastAPI and
@@ -37,7 +37,7 @@ marketplace:
   packages:
     - name: python-conventions
       source: mcyrrer/apm-python-conventions
-      version: "0.2.0"
+      version: "1.0.0"
       description: >-
         Python backend conventions — structlog logging (JSON/console), FastAPI and
         FastMCP defaults, SQLAlchemy + Alembic with CI-enforced migration tests on
