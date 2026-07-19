@@ -16,6 +16,12 @@ permissions:
   contents: write
   pull-requests: write
 
+# Serialize runs so overlapping dispatches can't force-push the same release
+# branch over each other.
+concurrency:
+  group: version-bump
+  cancel-in-progress: false
+
 jobs:
   bump:
     runs-on: ubuntu-latest
@@ -62,13 +68,15 @@ jobs:
           # push is rejected as non-fast-forward.
           git push --force -u origin "release/v${NEW}"
           # Open a PR only if one isn't already open for this branch; a re-run just
-          # updates the existing PR's branch via the force-push above.
-          if [ -z "$(gh pr list --head "release/v${NEW}" --state open --json number --jq '.[0].number')" ]; then
+          # updates the existing PR's branch via the force-push above. Use
+          # `// empty` so an empty list yields "" (not the string "null").
+          existing_pr="$(gh pr list --head "release/v${NEW}" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "${existing_pr}" ]; then
             gh pr create --base main --head "release/v${NEW}" \
               --title "Release v${NEW}" \
               --body "Automated version bump \`${CUR}\` → \`${NEW}\`.
 
           Merging this PR tags \`v${NEW}\` and publishes a GitHub Release."
           else
-            echo "An open PR already exists for release/v${NEW}; updated its branch."
+            echo "An open PR (#${existing_pr}) already exists for release/v${NEW}; updated its branch."
           fi
