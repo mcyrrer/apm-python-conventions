@@ -38,7 +38,7 @@ Releases are automated — don't hand-edit the version or create tags manually:
    `major`. It rewrites `apm.yml` (top-level `version` **and** the mirrored
    `marketplace.packages[].version`) and opens a `release/vX.Y.Z` PR.
 2. Review and merge that PR. On merge, the **Release** workflow tags
-   `vX.Y.Z`, packs the package, and publishes a GitHub Release.
+   `vX.Y.Z` and publishes a GitHub Release.
 
 ## Reporting issues
 
