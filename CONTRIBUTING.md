@@ -24,12 +24,21 @@ Read, in order:
 
 1. Branch from the default branch.
 2. Make focused changes with clear commit messages.
-3. If publishing a change, bump `version` in `apm.yml` (semver) and mirror it in
-   `marketplace.packages`.
-4. Validate: run `apm compile` (and `apm pack` before release) if the CLI is
+3. Validate: run `apm compile` (and `apm pack` before release) if the CLI is
    available, and resolve any warnings. Otherwise self-check against the
-   verification checklist in `docs/apm-format-reference.md`.
-5. Open a pull request describing what changed and why.
+   verification checklist in `docs/apm-format-reference.md`. (CI runs the same
+   `apm compile` check plus a version-consistency check on every PR.)
+4. Open a pull request describing what changed and why.
+
+## Releasing
+
+Releases are automated — don't hand-edit the version or create tags manually:
+
+1. Run the **Version bump** workflow (Actions tab), choosing `patch` / `minor` /
+   `major`. It rewrites `apm.yml` (top-level `version` **and** the mirrored
+   `marketplace.packages[].version`) and opens a `release/vX.Y.Z` PR.
+2. Review and merge that PR. On merge, the **Release** workflow tags
+   `vX.Y.Z`, packs the package, and publishes a GitHub Release.
 
 ## Reporting issues
 

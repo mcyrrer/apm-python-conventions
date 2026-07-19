@@ -1,0 +1,32 @@
+name: Validate
+
+# PR gate: fail if the top-level version and the mirrored marketplace versions
+# disagree, and run `apm compile` to catch any APM spec / frontmatter errors
+# before they reach main.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version consistency (top-level == marketplace)
+        run: |
+          python3 - <<'PY'
+          import re
+          s = open("apm.yml").read()
+          top = re.search(r'(?m)^version:\s*"?([0-9.]+)"?', s).group(1)
+          mkt = set(re.findall(r'(?m)^\s+version:\s*"([0-9.]+)"', s))
+          assert not mkt or mkt == {top}, f"marketplace {mkt} != top-level {top}"
+          print("version consistency OK:", top)
+          PY
+
+      - name: apm compile (spec check)
+        uses: microsoft/apm-action@v1
+        with:
+          compile: 'true'

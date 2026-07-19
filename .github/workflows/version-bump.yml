@@ -1,0 +1,65 @@
+name: Version bump
+
+# Manually bump the package version. Rewrites apm.yml (top-level `version:` and
+# every mirrored `marketplace.packages[].version`) and opens a release PR.
+# Merging that PR triggers the Release workflow, which tags v<version>.
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: Semver level to bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute and apply new version
+        id: bump
+        env:
+          LEVEL: ${{ inputs.level }}
+        run: |
+          python3 - <<'PY'
+          import re, os
+          s = open("apm.yml").read()
+          cur = re.search(r'(?m)^version:\s*"?([0-9]+\.[0-9]+\.[0-9]+)"?', s).group(1)
+          M, m, p = map(int, cur.split("."))
+          lvl = os.environ["LEVEL"]
+          if lvl == "major": M, m, p = M + 1, 0, 0
+          elif lvl == "minor": m, p = m + 1, 0
+          else: p += 1
+          new = f"{M}.{m}.{p}"
+          # top-level version (unquoted, first line only)
+          s = re.sub(r'(?m)^version:\s*.*$', f'version: {new}', s, count=1)
+          # marketplace.packages[].version (quoted + indented) -> keep mirrored
+          s = re.sub(r'(?m)^(\s+version:\s*)"[0-9]+\.[0-9]+\.[0-9]+"',
+                     rf'\g<1>"{new}"', s)
+          open("apm.yml", "w").write(s)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"new={new}\ncur={cur}\n")
+          PY
+
+      - name: Open release PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW: ${{ steps.bump.outputs.new }}
+          CUR: ${{ steps.bump.outputs.cur }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "release/v${NEW}"
+          git commit -am "Bump version to ${NEW}"
+          git push -u origin "release/v${NEW}"
+          gh pr create --base main --head "release/v${NEW}" \
+            --title "Release v${NEW}" \
+            --body "Automated version bump \`${CUR}\` → \`${NEW}\`.
+
+          Merging this PR tags \`v${NEW}\` and publishes a GitHub Release."
