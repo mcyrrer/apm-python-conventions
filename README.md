@@ -71,6 +71,13 @@ ask your agent to set up logging, a FastAPI/FastMCP service, or a database layer
   in-spec.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution workflow.
 
+## Releases
+
+Versioning and tagging are automated. Run the **Version bump** workflow from the
+Actions tab (`patch` / `minor` / `major`) to open a release PR; merging it tags
+`v<version>` and publishes a GitHub Release. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md#releasing).
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE).

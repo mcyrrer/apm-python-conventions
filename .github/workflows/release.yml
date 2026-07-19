@@ -1,0 +1,77 @@
+name: Release
+
+# On merge to main, tag the manifest version (v<version>) if it isn't tagged yet,
+# pack the package, and publish a GitHub Release. Idempotent: ordinary content
+# merges no-op because the current version's tag already exists. The first run
+# backfills the current version's tag.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read manifest version and assert consistency
+        id: v
+        run: |
+          python3 - <<'PY'
+          import re, os
+          s = open("apm.yml").read()
+          top = re.search(r'(?m)^version:\s*"?([0-9.]+)"?', s).group(1)
+          mkt = set(re.findall(r'(?m)^\s+version:\s*"([0-9.]+)"', s))
+          assert not mkt or mkt == {top}, f"marketplace {mkt} != top-level {top}"
+          open(os.environ["GITHUB_OUTPUT"], "a").write(f"version={top}\n")
+          PY
+
+      - name: Skip if tag already exists
+        id: check
+        run: |
+          if git rev-parse "v${{ steps.v.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push tag
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git tag "v${{ steps.v.outputs.version }}"
+          git push origin "v${{ steps.v.outputs.version }}"
+
+      - name: Pack (best-effort)
+        id: pack
+        if: steps.check.outputs.exists == 'false'
+        continue-on-error: true
+        uses: microsoft/apm-action@v1
+        with:
+          pack: 'true'
+          archive: 'true'
+
+      - name: Publish GitHub Release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUNDLE: ${{ steps.pack.outputs.bundle-path }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          # Attach whatever apm pack produced. This package has no dependencies,
+          # so bundle-path is often empty and pack emits the marketplace artifact
+          # instead — attach whichever exists; the release still publishes if none.
+          shopt -s nullglob
+          artifacts=()
+          [ -n "$BUNDLE" ] && [ -f "$BUNDLE" ] && artifacts+=( "$BUNDLE" )
+          for f in .claude-plugin/marketplace.json *.zip *.tar.gz *.apm.tgz; do
+            [ -f "$f" ] && artifacts+=( "$f" )
+          done
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --generate-notes \
+            "${artifacts[@]}"
