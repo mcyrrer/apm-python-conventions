@@ -16,9 +16,11 @@ Python services the same way.
 .apm/
 ├── skills/
 │   ├── python-development/       # structlog / FastAPI / FastMCP setup (+ references/)
+│   ├── code-quality/             # Ruff / mypy + PEP 8, clean-code, lint CI (+ references/, assets/)
 │   └── database-migrations/      # SQLAlchemy / Alembic + migration-tests CI (+ references/, assets/)
 └── instructions/
     ├── python-conventions.instructions.md   # always-on Python defaults
+    ├── clean-code.instructions.md           # always-on clean-code / PEP 8 rules
     └── database.instructions.md             # always-on DB / migrations defaults
 ```
 
@@ -26,6 +28,8 @@ Python services the same way.
 |-----------|--------------------------|
 | **`python-conventions` instructions** | Always-on Python defaults (structlog, FastAPI, FastMCP, typing, async). |
 | **`python-development` skill** | Setup recipes for structlog (JSON/console), FastAPI, and FastMCP, with copy-paste config. |
+| **`clean-code` instructions** | Always-on clean-code & PEP 8 rules (style, naming, functions, error handling, Ruff/mypy). |
+| **`code-quality` skill** | Ruff + mypy setup enforcing PEP 8, with copy-paste config and a ready-to-copy lint CI workflow. |
 | **`database` instructions** | Always-on DB defaults (SQLAlchemy, Alembic-per-change, Postgres 17, CI-enforced migration tests). |
 | **`database-migrations` skill** | SQLAlchemy + Alembic setup on PostgreSQL 17, and a ready-to-copy migration-tests CI workflow. |
 
@@ -34,6 +38,9 @@ Python services the same way.
 Backend-Python defaults captured as always-on instructions plus load-on-demand
 skills:
 
+- **Code quality** — clean, PEP 8-compliant Python everywhere, enforced with
+  **Ruff** (formatting + linting) and **mypy** (typing), plus a ready-to-copy
+  lint CI workflow (`code-quality` skill).
 - **Logging** — `structlog`, JSON in production and the console renderer for
   localhost, selected from the environment (`python-development` skill).
 - **Frameworks** — **FastAPI** for HTTP APIs and **FastMCP** for MCP servers,
