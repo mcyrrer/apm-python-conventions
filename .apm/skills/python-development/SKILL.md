@@ -17,7 +17,9 @@ rules in `python-conventions.instructions.md` in mind; this skill is the deeper
 ## Defaults at a glance
 
 - **Logging:** `structlog` — JSON renderer in every real environment, console
-  renderer only for localhost/dev, chosen from the environment.
+  renderer only for localhost/dev, chosen from the environment. Every line
+  carries callsite fields (`filename`, `lineno`, `func_name`) and the message
+  under the `message` key.
 - **HTTP API:** FastAPI, `async def` endpoints, Pydantic models, config via
   `pydantic-settings`, shared resources injected with `Depends`.
 - **MCP server:** FastMCP (`from fastmcp import FastMCP`) with decorator-defined
@@ -46,7 +48,8 @@ rules in `python-conventions.instructions.md` in mind; this skill is the deeper
 ## References (load as needed)
 
 - `references/structlog.md` — the `configure_logging()` recipe with the
-  JSON-default / console-for-localhost switch and processor chain.
+  JSON-default / console-for-localhost switch, processor chain, callsite fields,
+  and the `message` key.
 - `references/fastapi.md` — FastAPI app factory, settings, and structlog
   request-logging middleware.
 - `references/fastmcp.md` — FastMCP server skeleton, tools/resources, transports,
