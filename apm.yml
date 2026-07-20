@@ -1,7 +1,7 @@
 # APM producer manifest — https://microsoft.github.io/apm/producer/
 # Validated against the manifest schema: https://microsoft.github.io/apm/reference/manifest-schema/
 name: python-conventions
-version: 1.1.0
+version: 1.1.1
 description: >-
   Always-on Python backend conventions plus load-on-demand setup skills —
   clean-code & PEP 8 rules enforced with Ruff and mypy, structlog logging (JSON
@@ -37,7 +37,7 @@ marketplace:
   packages:
     - name: python-conventions
       source: mcyrrer/apm-python-conventions
-      version: "1.1.0"
+      version: "1.1.1"
       description: >-
         Python backend conventions — clean-code & PEP 8 enforced with Ruff and
         mypy, structlog logging (JSON/console), FastAPI and FastMCP defaults,
