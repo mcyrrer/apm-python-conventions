@@ -2,8 +2,8 @@
 
 Every repo that uses Alembic must run a migration-tests workflow in CI. The
 ready-to-copy file is `assets/migration-tests.yml`; drop it in at
-`.github/workflows/migration-tests.yml` and adjust the dependency-install step
-and the package/`env.py` import path.
+`.github/workflows/migration-tests.yml` and adjust the `DATABASE_URL` driver and
+the package/`env.py` import path. It installs deps with `uv sync` by default.
 
 ## What it asserts, and why
 
@@ -27,9 +27,9 @@ fail in CI instead of at deploy time.
 
 ## Adapting the workflow
 
-- **Install step:** replace the placeholder with your real dependency install
-  (`pip install -e .`, `uv sync`, `poetry install`, …) so `alembic` and the app
-  package are importable.
+- **Install step:** defaults to `uv sync` (deps and venv managed by uv). Only
+  change it if the project uses a different manager, so `alembic` and the app
+  package stay importable.
 - **`DATABASE_URL`:** the workflow exports one pointing at the service container;
   match the driver your `env.py`/app expects (`postgresql+psycopg://` for sync,
   `postgresql+asyncpg://` for async). The async Alembic template can run sync

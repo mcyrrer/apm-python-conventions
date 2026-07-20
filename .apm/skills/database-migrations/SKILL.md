@@ -36,10 +36,11 @@ in `references/` and a ready-to-copy CI workflow in `assets/`.
    development and for generating/verifying migrations.
 4. **Install the migration-tests workflow — always.** Copy
    `assets/migration-tests.yml` into the consumer repo's
-   `.github/workflows/migration-tests.yml` and adjust the install step /
-   package name. What it checks and why is in `references/migration-tests-ci.md`.
-5. **Verify locally** before pushing: `alembic upgrade head`, then
-   `alembic check` (must report no new operations), and a
+   `.github/workflows/migration-tests.yml`. It installs deps with `uv sync`;
+   adjust the `DATABASE_URL` driver / package name. What it checks and why is in
+   `references/migration-tests-ci.md`.
+5. **Verify locally** before pushing: `uv run alembic upgrade head`, then
+   `uv run alembic check` (must report no new operations), and a
    downgrade→upgrade roundtrip on the latest revision.
 
 ## References (load as needed)

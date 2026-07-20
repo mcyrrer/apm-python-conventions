@@ -52,8 +52,9 @@ Only `name` and `version` are strictly required. `version` must be semver
 | `compilation` | `strategy: distributed|single-file`, `resolve_links`, `source_attribution`, `exclude`. |
 | `marketplace` | Publishing metadata. `owner.name` is **required** under `marketplace`. Lists `packages:` with `name` + `source`. |
 
-Keep the top-level `name`/`version`/`description` and the `marketplace` entry in
-sync. Bump `version` on every published change.
+Keep the top-level `name`/`description` and the `marketplace` entry in sync.
+**Never bump `version` by hand** — the release workflow owns it; leave it
+untouched in your changes.
 
 ---
 
@@ -150,8 +151,8 @@ Plain JSON event handlers (e.g. `pre-commit`, `on-tool-use`). No frontmatter.
 5. **`applyTo` is required on instructions** and must be a valid glob.
 6. **Prompts reference inputs** with `${input:name}` and declare them under
    `input:`.
-7. **Bump `apm.yml` `version`** (semver) on every meaningful change, and mirror
-   it in `marketplace.packages`.
+7. **Never hand-edit `apm.yml` `version`** — the release workflow owns semver
+   bumps; leave `version` (and its `marketplace.packages` mirror) untouched.
 8. **Validate before publishing:** run `apm compile` / `apm pack` locally and
    fix any stripped-key or placement warnings.
 
