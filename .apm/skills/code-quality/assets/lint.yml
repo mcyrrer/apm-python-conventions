@@ -1,6 +1,7 @@
 # Lint, format, and type checks.
-# Copy to .github/workflows/lint.yml in the consumer repo and adjust the
-# "Install dependencies" step and the Python version to match the app.
+# Copy to .github/workflows/lint.yml in the consumer repo. Installs deps with
+# `uv sync`; adjust the Python version (and the install step only if the project
+# doesn't use uv) to match the app.
 # See the code-quality skill's references/tooling.md.
 name: lint
 
@@ -20,22 +21,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
-        # Replace with your real install so ruff + mypy and the app package
-        # import, e.g. `uv sync`, `poetry install`, or `pip install -e .[dev]`.
-        run: pip install -e ".[dev]"
+        # `uv sync` installs ruff + mypy (dev group) and the app package.
+        # If the project doesn't use uv, swap this for your real install.
+        run: uv sync
 
       - name: Check formatting
         # Fails if code isn't formatted; run `ruff format` locally to fix.
-        run: ruff format --check .
+        run: uv run ruff format --check .
 
       - name: Lint
         # Style, imports, naming, and bug-prone patterns (see [tool.ruff.lint]).
-        run: ruff check .
+        run: uv run ruff check .
 
       - name: Type-check
-        run: mypy
+        run: uv run mypy

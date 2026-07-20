@@ -24,14 +24,20 @@ rules in `python-conventions.instructions.md` in mind; this skill is the deeper
   `pydantic-settings`, shared resources injected with `Depends`.
 - **MCP server:** FastMCP (`from fastmcp import FastMCP`) with decorator-defined
   tools/resources.
+- **Tooling:** `uv` manages dependencies and the virtual environment (`uv venv`,
+  `uv add`, `uv sync`, `uv run`); Python **3.14** is the default target unless
+  asked otherwise.
 - **Baseline:** type hints on public signatures, async-first, `src/`-style
-  package, deps pinned in `pyproject.toml`.
+  package, deps pinned in `pyproject.toml` (with `uv.lock` committed).
 
 ## Setting up a service
 
-1. **Project skeleton.** Create a `src/<pkg>/` importable package and a
-   `pyproject.toml` with pinned dependencies (`structlog`, plus `fastapi` +
-   `uvicorn` or `fastmcp` as needed).
+1. **Project skeleton.** Scaffold with `uv` (`uv init`), targeting Python 3.14
+   (`.python-version` + `requires-python = ">=3.14"` in `pyproject.toml`) unless
+   the user asked for another version. Create the `src/<pkg>/` importable package,
+   then add pinned dependencies with `uv add` (`structlog`, plus `fastapi` +
+   `uvicorn` or `fastmcp` as needed) and `uv sync` so the uv-managed venv and
+   `uv.lock` are in place.
 2. **Configure logging first.** Add a `configure_logging()` and call it at
    startup, before anything logs. Use the env-driven JSON-vs-console switch from
    `references/structlog.md`.

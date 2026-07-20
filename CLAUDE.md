@@ -59,8 +59,9 @@ high-frequency rules:
   glob; `**/*` for always-on).
 - **Only use documented frontmatter keys.** Inventing fields causes
   compile-time strip warnings.
-- **Versioning:** bump `apm.yml` `version` (semver) on every meaningful change
-  and mirror it in `marketplace.packages`.
+- **Versioning:** **never** bump `apm.yml` `version` (or its
+  `marketplace.packages` mirror) by hand. Versioning is owned entirely by the
+  release workflow — leave `version` untouched in every change.
 
 ## Adding a new primitive (recipe)
 
@@ -68,8 +69,8 @@ high-frequency rules:
    `.apm/` subdirectory using the frontmatter in `docs/apm-format-reference.md`.
 2. If it's a skill, name the directory identically to the `SKILL.md` `name`.
 3. Cross-link related primitives (skill ↔ instructions) so they compose.
-4. Update `README.md` (what's included) and, if publishing, `apm.yml`
-   `version` + `marketplace`.
+4. Update `README.md` (what's included) and the `marketplace` entry if needed.
+   Do **not** touch `apm.yml` `version` — the release workflow owns it.
 5. Run the verification checklist at the bottom of
    `docs/apm-format-reference.md`.
 

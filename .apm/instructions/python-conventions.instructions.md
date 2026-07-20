@@ -45,6 +45,15 @@ scaffolding a project or wiring one of these tools.
   async SQLAlchemy) — don't block the event loop with sync I/O.
 - **Standard layout:** a `src/`-style importable package, dependencies declared
   and pinned in `pyproject.toml`.
+- **Use `uv` to manage the app** — dependencies *and* the virtual environment.
+  Add and lock deps with `uv add` / `uv sync` (commit `uv.lock`); don't use bare
+  `pip` or `poetry`.
+- **Always work in a virtual environment, created through uv.** Make the venv with
+  `uv venv` (never install into the system interpreter) and run commands through it
+  with `uv run …`.
+- **Python 3.14 is the default** target unless the user asks otherwise — set it in
+  `pyproject.toml` (`requires-python = ">=3.14"`) and pin it for uv
+  (`.python-version`).
 - **Clean, PEP 8-compliant style** is expected on every file — see
   `clean-code.instructions.md` for the rules and the `code-quality` skill for the
   Ruff + mypy setup that enforces them.

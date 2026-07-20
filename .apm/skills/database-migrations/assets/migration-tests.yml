@@ -1,6 +1,7 @@
 # Migration integrity tests.
-# Copy to .github/workflows/migration-tests.yml in the consumer repo and adjust
-# the "Install dependencies" step and the DATABASE_URL driver to match the app.
+# Copy to .github/workflows/migration-tests.yml in the consumer repo. Installs deps
+# with `uv sync`; adjust the DATABASE_URL driver (and the install step only if the
+# project doesn't use uv) to match the app.
 # See the database-migrations skill's references/migration-tests-ci.md.
 name: migration-tests
 
@@ -41,24 +42,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
-        # Replace with your real install so `alembic` + the app package import,
-        # e.g. `uv sync`, `poetry install`, or `pip install -e .`.
-        run: pip install -e .
+        # `uv sync` installs `alembic` + the app package into the uv-managed env.
+        # If the project doesn't use uv, swap this for your real install.
+        run: uv sync
 
       - name: Apply all migrations on a fresh database
-        run: alembic upgrade head
+        run: uv run alembic upgrade head
 
       - name: Check models and migrations are in sync
         # Fails if a model change has no matching migration (schema drift).
-        run: alembic check
+        run: uv run alembic check
 
       - name: Downgrade / upgrade roundtrip
         # Proves the latest revision's downgrade() reverses its upgrade().
         run: |
-          alembic downgrade -1
-          alembic upgrade head
+          uv run alembic downgrade -1
+          uv run alembic upgrade head

@@ -31,17 +31,18 @@ mechanical — with runnable config in `references/`.
 ## Setting up code quality
 
 1. **Add the dev dependencies.** Add `ruff` and `mypy` to the project's dev
-   dependency group in `pyproject.toml`.
+   dependency group with `uv add --dev ruff mypy`.
 2. **Add the config.** Copy the `[tool.ruff]`, `[tool.ruff.lint]`, and
    `[tool.mypy]` blocks from `references/tooling.md` into `pyproject.toml` and
    adjust `line-length`, target version, and package paths.
-3. **Run the tools.** `ruff format` then `ruff check --fix` to auto-fix, then
-   `mypy` to type-check. Resolve everything before committing — no blanket
-   `# noqa` / `# type: ignore` without a written reason.
+3. **Run the tools.** `uv run ruff format` then `uv run ruff check --fix` to
+   auto-fix, then `uv run mypy` to type-check. Resolve everything before
+   committing — no blanket `# noqa` / `# type: ignore` without a written reason.
 4. **Install the CI gate.** Copy `assets/lint.yml` to
-   `.github/workflows/lint.yml` in the consumer repo and adjust the install step
-   and Python version. This runs `ruff format --check`, `ruff check`, and `mypy`
-   so violations can't merge.
+   `.github/workflows/lint.yml` in the consumer repo. It installs deps with
+   `uv sync` and targets Python 3.14; adjust the Python version only if the
+   project asks otherwise. This runs `ruff format --check`, `ruff check`, and
+   `mypy` so violations can't merge.
 5. The clean-code and PEP 8 rules these tools enforce live in
    `clean-code.instructions.md` — read `references/pep8.md` and
    `references/clean-code.md` for the rationale and before/after examples.
